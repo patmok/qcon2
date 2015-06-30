@@ -4,6 +4,8 @@ similiar functionality to kx's qcon tool with the following extras:
 - paste multiple lines as one query (useful for lambdas)
 - allows quick switching between instances, driven by a config
 
+![alt tag](http://i.imgur.com/dVKYrvj.png)
+
 uses the following:
 
 - slightly modified vimcat, for the highlighting (https://github.com/vim-scripts/vimcat)
