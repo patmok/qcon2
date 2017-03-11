@@ -1,42 +1,62 @@
-similiar functionality to kx's qcon tool with the following extras:
+qcon2 is a terminal based front end to kdb+ (based on kx's qcon). it enables you to type in queries interactively, issue them to kdb+, and see the query results. it's a simple wrapper around q using single shot ipc:
 
-- display lambdas using vim syntax highlighting (i like colours)
-- paste multiple lines as one query (useful for lambdas)
-- allows quick switching between instances, driven by a config
+- display lambdas using vim syntax highlighting
+- paste multiple lines as one query
 
-![alt tag](http://i.imgur.com/dVKYrvj.png)
+![alt tag](https://raw.githubusercontent.com/patmok/qcon2/master/Capture.PNG)
 
 uses the following:
 
-- slightly modified vimcat, for the highlighting (https://github.com/vim-scripts/vimcat)
-- ncurses and cdk (http://invisible-island.net/cdk/)
-- readline library
+- very slightly modified [vimcat](https://github.com/vim-scripts/vimcat) for the highlighting 
 
-to compile, install cdk, ncurses, readline and readline-devel package and then:
+#### install
+- download [qcon2.sh](https://raw.githubusercontent.com/patmok/qcon2/master/qcon2.sh) and [vimcat.sh](https://raw.githubusercontent.com/patmok/qcon2/master/vimcat.sh), chmod u+x and put it somewhere under $PATH
+- optional, alias qcon2='rlwrap bash qcon2.sh'
 
-gcc qcon2.c -o qcon2 -L/path/to/cdk/cdk-5.0-20141106 -lcdk -lncurses -lreadline
-
-or use pkg-config to help
-
+#### example
+```
+patrick@ubuntu:~$ type qcon2
+qcon2 is aliased to `rlwrap bash qcon2.sh'
+patrick@ubuntu:~$ qcon2
 usage:
+         qcon2.sh port
+         qcon2.sh host:port
+         qcon2.sh host:port:user
+         qcon2.sh host:port:user:pass
 
-patrick@ubuntu:~/git/qcon2$ ./qcon2
+start query with p) to enter
+multiple lines, send EOF to flush
+\\ to exit qcon2 itself
+patrick@ubuntu:~$ qcon2 1234
+localhost:1234> 5#.Q
+    | ::
+k   | 3.3
+host| ![-12]
+addr| ![-13]
+gc  | ![-20]
+localhost:1234> til 5
+0 1 2 3 4
+```
 
-usage:qcon2 host:port
+multi line
+```
+localhost:1234> p)f:{x+y
++1}
 
-^\          - p)aste mode (SIGQUIT)
+localhost:1234> f
+{x+y +1}
+localhost:1234> f[1;2]
+4
 
-p)aste mode - send EOF after blank line to flush
+```
 
-env QCONVIM - path to vimcat script (optional, requires vim + q highlight)
+#### dependancies
 
-env QCONCFG - path to config file   (optional, requires libncurses)
+- q
+- vim
+- perl
 
-config file - one per line: NAME HOST:PORT. max 9000 entries of 256 char each
+#### change log
 
-;<ENTER>    - change connections using config
+- 2017.03.11, reworked so it's just a shell script instead of the old C binary. this means you need q to use it but no longer dependant on readline, ncurse etc and it's much easier to install
 
-
-example:
-
-QCONCFG=./exampleconfig QCONVIM=./vimcat.sh ./qcon2 localhost:1337
