@@ -1,12 +1,13 @@
 #!/bin/bash
 # TODO how to colour large result
+# TODO allow user to change prompt colour
 set -euo pipefail
 type q vim perl vimcat.sh >/dev/null 2>&1 || { echo >&2 "cannot find one or more of q, vim, perl and vimcat.sh"; exit 1; }
 hp=${1:-}
 # TODO improve basic input check
 if [[ -n `echo $hp | perl -wnE 'say /^[0-9]+$/g'` ]]; then
 	hp="localhost:$hp"
-elif [[ -z `echo $hp | perl -wnE 'say /^[\w.]+:[0-9]+(?::.*$)?$/g'` ]]; then
+elif [[ -z `echo $hp | perl -wnE 'say /^([\w.-]+:[0-9]+(?::[^:\s]*)?)(?::[^\s]*)?$/g'` ]]; then
 	echo "usage: "
 	echo -e "\t qcon2.sh port"
 	echo -e "\t qcon2.sh host:port"
@@ -17,8 +18,10 @@ elif [[ -z `echo $hp | perl -wnE 'say /^[\w.]+:[0-9]+(?::.*$)?$/g'` ]]; then
 	echo "\\\\ to exit qcon2 itself"
 	exit 1
 fi
+dhp=`echo $hp | perl -wnE 'say /^([\w.-]+:[0-9]+(?::[^:\s]*)?)(?::[^\s]*)?$/g'`
+
 while true; do
-	echo -ne '\033[1;32m'$hp'>\033[0m'
+	echo -ne '\033[1;32m'$dhp'>\033[0m'
 	IFS=$' \t\n'	
 	read -r text
 	# paste/multi lines start with p)
@@ -34,7 +37,7 @@ while true; do
 
 	text=$(echo $text | sed 's/\\/\\\\/g' | sed 's/\"/\\\"/g')
 	IFS=$'\0'
-	res=$(echo "\`:$hp\"$text\"" | q -c $(tput lines) $(tput cols))
+	res=$(echo "hsym[\`$\"$hp\"]\"$text\"" | q -c $(tput lines) $(tput cols))
 	reswc=`echo "$res" | wc -l`
 	# skip vimcat if result too big
 	if [[ $reswc -lt 200 && -z `echo $res | perl -wnE 'say /\.\.$/gm'` ]]; then
