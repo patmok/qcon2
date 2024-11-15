@@ -25,7 +25,7 @@ while true; do
 	IFS=$' \t\n'	
 	read -r text
 	# paste/multi lines start with p)
-	if [[ -n `echo $text | perl -wnE 'say /p\).*/g'` ]]; then
+	if [[ -n `echo $text | perl -wnE 'say /^p\).*/g'` ]]; then
 		text=${text:2}' '$(cat)
 	fi
 
